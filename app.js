@@ -199,6 +199,17 @@ function init() {
 
   addInput.addEventListener('input', hideError);
 
+  addInput.addEventListener('keydown', (e) => {
+    if (e.key === 'Enter' && !e.shiftKey) {
+      e.preventDefault();
+      const value = addInput.value;
+      if (addTask(value)) {
+        addInput.value = '';
+      }
+      addInput.focus();
+    }
+  });
+
   addForm.addEventListener('submit', (e) => {
     e.preventDefault();
     const value = addInput.value;

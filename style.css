@@ -115,7 +115,8 @@ body {
 
 .add-input {
   width: 100%;
-  height: 56px;
+  min-height: 56px;
+  max-height: 120px;
   background: #FFFFFF;
   border: 1px solid #E8E4DE;
   border-radius: 16px;
@@ -126,6 +127,9 @@ body {
   outline: none;
   transition: border-color 0.2s ease, box-shadow 0.2s ease;
   box-shadow: 0 2px 12px rgba(0, 0, 0, 0.03);
+  resize: none;
+  line-height: 1.5;
+  overflow-y: auto;
 }
 
 .add-input::placeholder {
@@ -211,12 +215,13 @@ body {
 /* Task item */
 .task-item {
   display: flex;
-  align-items: center;
+  align-items: flex-start;
   gap: 16px;
   padding: 18px 20px;
   border-radius: 16px;
   transition: background-color 0.2s ease;
   position: relative;
+  cursor: pointer;
 }
 
 .task-item:not(:last-child)::after {
@@ -305,15 +310,20 @@ body {
   height: 22px;
   min-width: 22px;
   border: 2px solid #D6D1CA;
-  border-radius: 50%;
+  border-radius: 7px;
   cursor: pointer;
   position: relative;
   transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
   background-color: transparent;
+  margin-top: 2px;
+}
+
+.task-item:hover .task-checkbox:not(:checked) {
+  border-color: #C9A03A;
 }
 
 .task-checkbox:hover {
-  border-color: #C9A03A;
+  background-color: rgba(212, 160, 58, 0.08);
 }
 
 .task-checkbox:checked {
@@ -347,6 +357,7 @@ body {
   font-size: 0.9375rem;
   line-height: 1.5;
   word-break: break-word;
+  white-space: pre-wrap;
   color: #2C2C2C;
   transition: color 0.2s ease;
 }
@@ -370,7 +381,7 @@ body {
   justify-content: center;
   transition: all 0.2s ease;
   flex-shrink: 0;
-  opacity: 0.5;
+  opacity: 0.6;
 }
 
 .task-item:hover .delete-button {
@@ -380,11 +391,16 @@ body {
 .delete-button:hover {
   color: #E86C5C;
   background-color: #FFF0ED;
+  transform: scale(1.1);
+}
+
+.delete-button:active {
+  transform: scale(0.95);
 }
 
 .delete-button svg {
-  width: 16px;
-  height: 16px;
+  width: 18px;
+  height: 18px;
 }
 
 /* Empty state */
@@ -473,10 +489,11 @@ body {
   }
 
   .add-input {
-    height: 50px;
+    min-height: 50px;
     padding: 12px 18px;
     font-size: 0.9375rem;
     border-radius: 14px;
+    max-height: 80px;
   }
 
   .add-button {
