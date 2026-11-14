@@ -22,6 +22,21 @@ function hideError() {
   }
 }
 
+function autoResizeTextarea() {
+  const textarea = document.getElementById('addInput');
+  if (!textarea) return;
+  textarea.style.height = 'auto';
+  const scrollHeight = textarea.scrollHeight;
+  const maxHeight = parseInt(getComputedStyle(textarea).maxHeight, 10) || 120;
+  if (scrollHeight > maxHeight) {
+    textarea.style.height = maxHeight + 'px';
+    textarea.style.overflowY = 'auto';
+  } else {
+    textarea.style.height = scrollHeight + 'px';
+    textarea.style.overflowY = 'hidden';
+  }
+}
+
 function loadTasks() {
   try {
     const stored = localStorage.getItem(STORAGE_KEY);
@@ -57,9 +72,20 @@ function createTaskElement(task, isNew = false) {
   checkbox.setAttribute('aria-label', task.completed ? 'Отметить как невыполненную' : 'Отметить как выполненную');
   checkbox.addEventListener('change', () => toggleTask(task.id));
 
+  const contentWrapper = document.createElement('div');
+  contentWrapper.className = 'task-content-wrapper';
+
   const span = document.createElement('span');
   span.className = 'task-text';
   span.textContent = task.text;
+
+  const expandBtn = document.createElement('button');
+  expandBtn.type = 'button';
+  expandBtn.className = 'expand-button';
+  expandBtn.textContent = 'Показать полностью';
+
+  contentWrapper.appendChild(span);
+  contentWrapper.appendChild(expandBtn);
 
   const deleteBtn = document.createElement('button');
   deleteBtn.className = 'delete-button';
@@ -76,10 +102,29 @@ function createTaskElement(task, isNew = false) {
   deleteBtn.addEventListener('click', () => deleteTask(task.id));
 
   li.appendChild(checkbox);
-  li.appendChild(span);
+  li.appendChild(contentWrapper);
   li.appendChild(deleteBtn);
 
   return li;
+}
+
+function initExpandButton(li) {
+  const span = li.querySelector('.task-text');
+  const expandBtn = li.querySelector('.expand-button');
+  if (!span || !expandBtn || expandBtn.dataset.inited === 'true') return;
+  expandBtn.dataset.inited = 'true';
+
+  requestAnimationFrame(() => {
+    if (span.scrollHeight > span.clientHeight + 1) {
+      expandBtn.style.display = 'inline-flex';
+    }
+  });
+
+  expandBtn.addEventListener('click', (e) => {
+    e.stopPropagation();
+    const isExpanded = span.classList.toggle('expanded');
+    expandBtn.textContent = isExpanded ? 'Свернуть' : 'Показать полностью';
+  });
 }
 
 function updateTaskCount() {
@@ -101,7 +146,9 @@ function renderTasks() {
   } else {
     emptyEl.classList.remove('visible');
     tasks.forEach(task => {
-      listEl.appendChild(createTaskElement(task));
+      const li = createTaskElement(task);
+      listEl.appendChild(li);
+      initExpandButton(li);
     });
   }
 
@@ -133,6 +180,7 @@ function addTask(text) {
 
   const li = createTaskElement(task, true);
   listEl.insertBefore(li, listEl.firstChild);
+  initExpandButton(li);
 
   updateTaskCount();
 
@@ -197,7 +245,10 @@ function init() {
   loadTasks();
   renderTasks();
 
-  addInput.addEventListener('input', hideError);
+  addInput.addEventListener('input', () => {
+    hideError();
+    autoResizeTextarea();
+  });
 
   addInput.addEventListener('keydown', (e) => {
     if (e.key === 'Enter' && !e.shiftKey) {
@@ -205,6 +256,8 @@ function init() {
       const value = addInput.value;
       if (addTask(value)) {
         addInput.value = '';
+        addInput.style.height = '';
+        autoResizeTextarea();
       }
       addInput.focus();
     }
@@ -215,6 +268,8 @@ function init() {
     const value = addInput.value;
     if (addTask(value)) {
       addInput.value = '';
+      addInput.style.height = '';
+      autoResizeTextarea();
     }
     addInput.focus();
   });

@@ -129,7 +129,8 @@ body {
   box-shadow: 0 2px 12px rgba(0, 0, 0, 0.03);
   resize: none;
   line-height: 1.5;
-  overflow-y: auto;
+  overflow-y: hidden;
+  scrollbar-width: thin;
 }
 
 .add-input::placeholder {
@@ -351,20 +352,56 @@ body {
   100% { transform: rotate(45deg) scale(1); }
 }
 
+/* Task content wrapper */
+.task-content-wrapper {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
 /* Task text */
 .task-text {
-  flex: 1;
   font-size: 0.9375rem;
   line-height: 1.5;
   word-break: break-word;
   white-space: pre-wrap;
   color: #2C2C2C;
   transition: color 0.2s ease;
+  display: -webkit-box;
+  -webkit-line-clamp: 4;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+.task-text.expanded {
+  -webkit-line-clamp: unset;
+  display: block;
+  overflow: visible;
 }
 
 .task-item.completed .task-text {
   color: #B5B0A8;
   text-decoration: line-through;
+}
+
+/* Expand button */
+.expand-button {
+  display: none;
+  align-self: flex-start;
+  background: none;
+  border: none;
+  color: #9E9A94;
+  font-size: 0.8125rem;
+  font-family: inherit;
+  cursor: pointer;
+  padding: 2px 0;
+  transition: color 0.2s ease;
+}
+
+.expand-button:hover {
+  color: #D4A03A;
 }
 
 /* Delete button */
@@ -493,7 +530,7 @@ body {
     padding: 12px 18px;
     font-size: 0.9375rem;
     border-radius: 14px;
-    max-height: 80px;
+    max-height: 100px;
   }
 
   .add-button {
